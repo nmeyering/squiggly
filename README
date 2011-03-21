@@ -1,0 +1,4 @@
+usage:
+./main.py [STEPS]
+
+where STEPS is the recursion depth of the line dividing algorithm
