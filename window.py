@@ -26,11 +26,18 @@ class Window( QWidget ):
 		self.steps_slider.setRange(1,12)
 
 		self.smooth_spin = QSpinBox()
-		self.smooth_spin.setRange(1,12)
+		self.smooth_spin.setRange(1,100)
 		self.smooth_label = QLabel("smoothness:")
 		self.smooth_slider = QSlider(1) #horizontal
 		self.smooth_slider.setRange(0,100)
 		self.smooth_slider.setSingleStep(1)
+
+		self.dampen_spin = QSpinBox()
+		self.dampen_spin.setRange(1,100)
+		self.dampen_label = QLabel("dampening:")
+		self.dampen_slider = QSlider(1) #horizontal
+		self.dampen_slider.setRange(0,100)
+		self.dampen_slider.setSingleStep(1)
 
 		self.update_button = QPushButton("update")
 
@@ -48,6 +55,7 @@ class Window( QWidget ):
 			self.steps_slider,
 			0,
 			2)
+
 		self.main_layout.addWidget(
 			self.smooth_spin,
 			1,
@@ -60,12 +68,27 @@ class Window( QWidget ):
 			self.smooth_slider,
 			1,
 			2)
+
+		self.main_layout.addWidget(
+			self.dampen_spin,
+			2,
+			0)
+		self.main_layout.addWidget(
+			self.dampen_label,
+			2,
+			1)
+		self.main_layout.addWidget(
+			self.dampen_slider,
+			2,
+			2)
+
 		self.main_layout.addWidget(
 			self.update_button,
 			3,
 			0,
 			1,
 			3)
+
 		self.main_layout.addWidget(
 			self.view,
 			4,
