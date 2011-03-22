@@ -3,35 +3,68 @@ import sys, os
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QApplication
 from PyQt4.QtCore import QLineF, QPointF
-from squiggly import Squiggly
-import random
+from window import Window
+import random, math
 
+class Squiggly:
+	def __init__(self):
+		if len(sys.argv) == 3:
+			self.steps = int(sys.argv[1])
+			self.smoothness = float(sys.argv[2])
+		else:
+			self.steps = 4
+			self.smoothness = 0.7
+
+
+		self.app = QApplication(sys.argv)
+
+		self.win = Window()
+
+		self.win.steps_spin.valueChanged.connect(self.steps_update)
+		self.win.steps_slider.valueChanged.connect(self.steps_update)
+		self.win.smooth_spin.valueChanged.connect(self.smooth_update)
+		self.win.smooth_slider.valueChanged.connect(self.smooth_update)
+		self.win.update_button.clicked.connect(self.draw_lines)
+
+		self.starting_line = QLineF(0,0,400.0,0)
+		self.draw_lines()
+		self.win.show()
+
+		sys.exit(self.app.exec_())
+
+	def steps_update(self, value):
+		self.steps = value
+		self.win.steps_spin.setValue(value)
+		self.win.steps_slider.setValue(value)
+		self.draw_lines()
+
+	def smooth_update(self, value):
+		self.smoothness = value/100.0
+		self.win.smooth_spin.setValue(value)
+		self.win.smooth_slider.setValue(value)
+		self.draw_lines()
+
+	def draw_lines(self):
+		lines = self.generate_lines(
+			self.starting_line,
+			self.steps,
+			self.smoothness)
+		self.win.setLines(lines)
+
+	def generate_lines(self, line, steps = 4, smoothness = 0.7):
+		if steps <= 0:
+			return [line]
+		mid = (line.p1() + line.p2()) * 0.5
+		diff = (line.p2() - line.p1())
+		norm = QPointF(-diff.y(), diff.x())
+		mid += norm * (random.random() - 0.5) * smoothness
+		return self.generate_lines(
+			QLineF(line.p1(), mid), steps - 1, smoothness
+			) + self.generate_lines(
+			QLineF(mid, line.p2()), steps - 1, smoothness)
+	
 def main():
-	if len(sys.argv) > 1:
-		steps = int(sys.argv[1])
-	else:
-		steps = 4
-
-	lines = squiggle(QLineF(0.0,0.0,400.0,400.0),steps)
-	print(lines)
-	app = QApplication(sys.argv)
-	squiggly = Squiggly(lines)
-	squiggly.show()
-
-	sys.exit(app.exec_())
-
-def squiggle(line, steps):
-	if steps <= 0:
-		return [line]
-	mid = (line.p1() + line.p2()) * 0.5
-	diff = (line.p2() - line.p1())
-	norm = QPointF(-diff.y(), diff.x())
-	mid += norm * (random.random() - 0.5) * 0.7
-	#norm = norm / math.sqrt(norm.x() ** 2 + norm.y() ** 2)
-	return squiggle(
-		QLineF(line.p1(), mid), steps - 1
-		) + squiggle(
-		QLineF(mid, line.p2()), steps - 1)
+	Squiggly()
 
 if __name__ == "__main__":
 	main()
