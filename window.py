@@ -15,7 +15,6 @@ from PyQt4.QtGui import QColor
 class Window( QWidget ):
 	def __init__(self):
 		QWidget.__init__(self)
-		self.scene = QGraphicsScene()
 
 		self.main_layout = QGridLayout()
 
@@ -99,11 +98,3 @@ class Window( QWidget ):
 		self.setLayout(
 			self.main_layout)
 
-		#scene.addRect(0,0,50,50,QPen(QColor("red")))
-		self.view.setScene(self.scene)
-
-	def setLines(self, lines):
-		self.scene.clear()
-		for line in lines:
-			self.scene.addLine(line)
-		self.repaint()
