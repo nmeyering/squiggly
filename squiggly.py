@@ -1,11 +1,11 @@
 import sys, os
-from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QApplication
-from PyQt4.QtGui import QGraphicsScene
+from PyQt4.QtGui import QGraphicsScene, QGraphicsPolygonItem, QPolygonF, QBrush, QColor, QPixmap
 from PyQt4.QtCore import QLineF, QPointF, QRectF
 from window import Window
 from grid import Grid
 from path import Path
+from subregion import SubRegion
 import random, math
 
 class Squiggly:
@@ -18,10 +18,34 @@ class Squiggly:
 		self.scene = QGraphicsScene(dim)
 		self.win.view.setScene(self.scene)
 
-		self.path = Path(dim)
 		self.grid = Grid(size = 16, bounds = dim)
 
 		self.scene.addItem(self.grid)
+		mypoly = QPolygonF([
+			QPointF(0,0),
+			QPointF(100,0),
+			QPointF(100,100),
+			QPointF(0,150),
+			QPointF(-50,50)])
+		mypoly = SubRegion(mypoly)
+		mypoly.setBrush(QBrush(QPixmap("asphalt256.png")))
+		mypoly.setConnectors([(0,0.5),(1,0.2),(2,0.8)])
+		mypoly.translate(100,100)
+		self.scene.addItem(mypoly)
+
+		mypoly2 = QPolygonF([
+			QPointF(-100,-100),
+			QPointF(-100,100),
+			QPointF(100,100),
+			QPointF(100,-100)])
+		mypoly2 = SubRegion(mypoly2)
+		mypoly2.setBrush(QBrush(QPixmap("asphalt256.png")))
+		mypoly2.setConnectors([(0,0.5),(2,0.2)])
+		mypoly2.translate(600,300)
+		self.scene.addItem(mypoly2)
+
+		self.path = Path(QRectF(mypoly.connectors[1] + mypoly.mapToScene(mypoly.pos()),
+			mypoly2.connectors[0] + mypoly2.mapToScene(mypoly2.pos())))
 		self.scene.addItem(self.path)
 
 		self.win.smooth_slider.setValue(self.path.smooth)
