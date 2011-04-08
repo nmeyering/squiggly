@@ -21,32 +21,33 @@ class Squiggly:
 		self.grid = Grid(size = 16, bounds = dim)
 
 		self.scene.addItem(self.grid)
-		mypoly = QPolygonF([
-			QPointF(0,0),
-			QPointF(100,0),
-			QPointF(100,100),
-			QPointF(0,150),
-			QPointF(-50,50)])
-		mypoly = SubRegion(mypoly)
+
+		mypoly = SubRegion(dim = QRectF(-200,-200,200,200))
 		mypoly.setBrush(QBrush(QPixmap("asphalt256.png")))
-		mypoly.setConnectors([(0,0.5),(1,0.2),(2,0.8)])
-		mypoly.translate(100,100)
+		mypoly.translate(200,200)
 		self.scene.addItem(mypoly)
 
-		mypoly2 = QPolygonF([
-			QPointF(-100,-100),
-			QPointF(-100,100),
-			QPointF(100,100),
-			QPointF(100,-100)])
-		mypoly2 = SubRegion(mypoly2)
+		mypoly2 = SubRegion(dim = QRectF(-200,-200,200,200))
 		mypoly2.setBrush(QBrush(QPixmap("asphalt256.png")))
-		mypoly2.setConnectors([(0,0.5),(2,0.2)])
-		mypoly2.translate(600,300)
+		mypoly2.translate(600,400)
 		self.scene.addItem(mypoly2)
 
-		self.path = Path(QRectF(mypoly.connectors[1] + mypoly.mapToScene(mypoly.pos()),
-			mypoly2.connectors[0] + mypoly2.mapToScene(mypoly2.pos())))
+		mypoly3 = SubRegion(dim = QRectF(-100,-100,100,100))
+		mypoly3.setBrush(QBrush(QColor("green")))
+		mypoly3.translate(350,400)
+		self.scene.addItem(mypoly3)
+
+		self.link(mypoly, mypoly3)
+		self.link(mypoly3, mypoly2)
+		#self.path = Path(mypoly.connectors[1] + mypoly.mapToScene(mypoly.pos()),
+		#	mypoly2.connectors[0] + mypoly2.mapToScene(mypoly2.pos()))
+		self.path = Path(mypoly2.connectors[1] + mypoly2.mapToScene(mypoly2.pos()),
+			QPointF(800,300))
+		self.path_out = Path(QPointF(0,300),
+			mypoly.connectors[0] + mypoly.mapToScene(mypoly.pos()))
+
 		self.scene.addItem(self.path)
+		self.scene.addItem(self.path_out)
 
 		self.win.smooth_slider.setValue(self.path.smooth)
 		self.win.dampen_slider.setValue(self.path.dampen)
@@ -67,6 +68,10 @@ class Squiggly:
 		self.win.show()
 
 		sys.exit(self.app.exec_())
+
+	def link(self, a, b):
+		self.scene.addItem(Path(a.exit() + a.mapToScene(a.pos()),
+			b.entrance() + b.mapToScene(b.pos())))
 
 	def steps_slider_update(self, value):
 		self.path.steps = value

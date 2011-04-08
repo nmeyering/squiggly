@@ -5,15 +5,15 @@ from PyQt4.QtCore import QLineF, QRectF, QPointF
 import random
 
 class Path(QGraphicsItem):
-	def __init__(self, bounds = QRectF(0,0,100,100), pen = QPen(QColor(0,0,0,255))):
+	def __init__(self, start, end, pen = QPen(QColor(0,0,0,255))):
 		self.pen = pen
 
 		QGraphicsItem.__init__(self)
 
-		self.starting_line = QLineF(bounds.topLeft(), bounds.bottomRight())
+		self.starting_line = QLineF(start, end)
 		self.bounds = QRectF(
-			bounds.center() - (bounds.bottomRight() - bounds.topLeft()),
-			bounds.center() + (bounds.bottomRight() - bounds.topLeft()))
+			start - (end - start),
+			end + (end - start))
 
 		self.steps = 4
 		self.smooth = 50
@@ -41,7 +41,6 @@ class Path(QGraphicsItem):
 			QLineF(mid, line.p2()), steps - 1, smooth * dampen)
 
 	def paint(self, painter, option, widget = None):
-		bounds = self.bounds
 		painter.setPen(self.pen)
 		for line in self.lines:
 			painter.drawLine(line)
